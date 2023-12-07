@@ -1,2 +1,0 @@
-# eventia-api
-eventia-api
