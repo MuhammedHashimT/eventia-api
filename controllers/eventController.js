@@ -14,6 +14,8 @@ const {
 } = require("firebase/firestore");
 const crypto = require("crypto");
 const { driveConfig } = require("../utils/google/driveApi");
+const nodemailer = require("nodemailer");
+const { apiGoogle } = require("../utils/google/gmailApi");
 
 
 
@@ -111,51 +113,88 @@ const createEvent = async (req, res, next) => {
     data.eventId = eventId;
     const docRef = doc(getFirestore(), "events", eventId);
     const result = await setDoc(docRef, data);
+
+    
+    // sending email notifiacation to the user
+    const driveClientId = process.env.GOOGLE_DRIVE_CLIENT_ID || '';
+    const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
+    const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
+    async function sendMail() {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          type: "OAuth2",
+          user: "ahmedmsmd2005@gmail.com",
+          clientId: driveClientId,
+          clientSecret: driveClientSecret,
+          refreshToken: driveRefreshToken,
+          accessToken: apiGoogle(),
+        },
+      })
+
+    // // find the user details
+    //   const docRef = doc(getFirestore(), "users", data.ownerId);
+    //   const docSnap = await getDoc(docRef);
+    //   if (docSnap.exists()) {
+    //     // res.send(docSnap.data());
+    //     const email = docSnap.data().email;
+    //   } else {
+    //     console.log("No such document!");
+    //     // res.send("No such document!");
+    //   }
+
+      // send mail with defined transport object
+      const info = await transporter.sendMail({
+        from: '"Team Eventia" <ahmedmsmd2005@gmail.com>', // sender address
+        to: "ajnanpulikkathody@gmail.com", // list of receivers
+        subject: "Hello Ajnan, your event is live", // Subject line
+        text: "Ask your freinds to join your event. ✈️✈️", // plain text body
+        // html: "<b>Hello world?</b>", // html body
+      })
+      return info;
+    }
+    await sendMail().then(result => console.log(result)).catch((err) => console.log(err));
     res.status(200).json({ message: "Event created successfully", data });
   } catch (error) {
     res.status(400).send(error.message);
   }
 
-  // router.post("/upload", fileUpload(), async (req, res) => {
-  //   const files = Array.isArray(req.files.files) ? req.files.files : [req.files.files];
-  //   console.log(files);
-  //   const uploadFile = async (filePath, fileName, mimeType) => {
-  //     // check the file is image
-  //     if (!mimeType.includes('image')) {
-  //       return res.status(400).send(`File is not an image`);
-  //     }
 
-  //     const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
-  //     try {
-  //       const drive = driveConfig();
-  //       const response = await drive.files.create({
-  //         requestBody: {
-  //           name: fileName,
-  //           mimeType,
-  //           parents: folderId ? [folderId] : [],
-  //         },
-  //         media: {
-  //           mimeType,
-  //           body: filePath,
-  //         },
-  //       });
-  //       return response.data.id;
-  //     } catch (error) {
-  //       return res.status(400).send(`Error on google drive upload , check the image of ${fileName}`);
-  //     }
+
+  // // Admin signup route
+  // router.get("/mail", async (req, res) => {
+  //   // const data = req.body;
+  //   const driveClientId = process.env.GOOGLE_DRIVE_CLIENT_ID || '';
+  //   const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
+  //   const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
+  //   async function sendMail() {
+  //     const transporter = nodemailer.createTransport({
+  //       service: "gmail",
+  //       auth: {
+  //         type: "OAuth2",
+  //         user: "ahmedmsmd2005@gmail.com",
+  //         clientId: driveClientId,
+  //         clientSecret: driveClientSecret,
+  //         refreshToken: driveRefreshToken,
+  //         accessToken: apiGoogle(),
+  //       },
+  //     })
+
+  //     // send mail with defined transport object
+  //     const info = await transporter.sendMail({
+  //       from: '"Fred Foo 👻" <ahmedmsmd2005@gmail.com>', // sender address
+  //       to: "hashimt4567@gmail.com", // list of receivers
+  //       subject: "Hello ✔", // Subject line
+  //       text: "Hello world?", // plain text body
+  //       // html: "<b>Hello world?</b>", // html body
+  //     })
+  //     return info;
   //   }
-  //   try {
-  //     const imageIds = await Promise.all(files.map(async (file) => {
-  //       const imageId = await uploadFile(file.tempFilePath, file.name, file.mimetype);
-  //       console.log(imageId);
-  //       return imageId;
-  //     }))
-  //     await res.send(imageIds);
-  //   } catch (error) {
-  //     res.status(400).send(error.message);
-  //   }
+  //   await sendMail().then(result => console.log(result)).catch((err) => console.log(err));
+
   // });
+
 };
 
 const updateEvent = async (req, res, next) => {

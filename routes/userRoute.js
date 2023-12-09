@@ -149,8 +149,7 @@ const {
   getFirestore,
 } = require("firebase/firestore");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
-const { apiGoogle } = require("../utils/google/gmailApi");
+
 
 
 const router = express.Router();
@@ -223,47 +222,12 @@ router.post("/signup", async (req, res) => {
       data.userId = userId;
       const docRef = doc(firestoreDb, "users", userId);
       const response = await setDoc(docRef, data);
-      res.status(200).json({ message: "User created successfully" , data});
+      res.status(200).json({ message: "User created successfully", data });
     }
     // res.send(finalData);
   } catch (error) {
     res.status(400).send(error.message);
   }
-});
-
-
-
-// Admin signup route
-router.get("/mail", async (req, res) => {
-  // const data = req.body;
-  const driveClientId = process.env.GOOGLE_DRIVE_CLIENT_ID || '';
-  const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
-  const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
-  async function sendMail() {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: "ahmedmsmd2005@gmail.com",
-        clientId: driveClientId,
-        clientSecret: driveClientSecret,
-        refreshToken: apiGoogle(),
-        accessToken: apiGoogle(),
-      },
-    })
-
-    // send mail with defined transport object
-    const info = await transporter.sendMail({
-      from: '"Fred Foo 👻" <ahmedmsmd2005@gmail.com>', // sender address
-      to: "hasimt4567@gmail.com", // list of receivers
-      subject: "Hello ✔", // Subject line
-      text: "Hello world?", // plain text body
-      // html: "<b>Hello world?</b>", // html body
-    })
-    return info;
-  }
-  await sendMail().then(result => console.log(result)).catch((err) => console.log(err));
-
 });
 
 module.exports = {
