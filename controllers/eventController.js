@@ -183,6 +183,8 @@ const deleteEvent = async (req, res, next) => {
   }
 };
 
+
+
 module.exports = {
   createEvent,
   updateEvent,

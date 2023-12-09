@@ -22,5 +22,5 @@ const driveConfig = () => {
 }
 
 module.exports = {
-    driveConfig,
+    driveConfig
 };

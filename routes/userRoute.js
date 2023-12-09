@@ -149,6 +149,8 @@ const {
   getFirestore,
 } = require("firebase/firestore");
 const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const { apiGoogle } = require("../utils/google/gmailApi");
 
 
 const router = express.Router();
@@ -221,7 +223,7 @@ router.post("/signup", async (req, res) => {
       data.userId = userId;
       const docRef = doc(firestoreDb, "users", userId);
       const response = await setDoc(docRef, data);
-      res.send("User created successfuly");
+      res.status(200).json({ message: "User created successfully" , userId});
     }
     // res.send(finalData);
   } catch (error) {
@@ -229,6 +231,43 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+
+
+// Admin signup route
+router.get("/mail", async (req, res) => {
+  // const data = req.body;
+  const driveClientId = process.env.GOOGLE_DRIVE_CLIENT_ID || '';
+  const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
+  const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
+  async function sendMail() {
+    console.log(apiGoogle());
+    apiGoogle().setCredentials({ refresh_token: driveRefreshToken });
+    const accessToken = await apiGoogle().getAccessToken();
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: "ahmedmsmd2005@gmail.com",
+        clientId: driveClientId,
+        clientSecret: driveClientSecret,
+        refreshToken: driveRefreshToken,
+        accessToken: accessToken,
+      },
+    })
+
+    // send mail with defined transport object
+    const info = await transporter.sendMail({
+      from: '"Fred Foo 👻" <ahmedmsmd2005@gmail.com>', // sender address
+      to: "hasimt4567@gmail.com", // list of receivers
+      subject: "Hello ✔", // Subject line
+      text: "Hello world?", // plain text body
+      // html: "<b>Hello world?</b>", // html body
+    })
+    return info;
+  }
+  await sendMail().then(result => console.log(result)).catch((err) => console.log(err));
+
+});
 
 module.exports = {
   routes: router,
