@@ -137,6 +137,23 @@ const getUserInfo = async (req, res, next) => {
   }
 };
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    const firestoreDb = getFirestore();
+    const collectionRef = collection(firestoreDb, "users");
+    const finalData = [];
+    const q = query(collectionRef);
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+      finalData.push(doc.data());
+    });
+    res.send(finalData);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
 const createUser = async (req, res, next) => {
   try {
     const firestoreDb = getFirestore();
@@ -180,6 +197,7 @@ const deleteUser = async (req, res, next) => {
 
 module.exports = {
   getUserInfo,
+  getAllUsers,
   createUser,
   updateUser,
   deleteUser,

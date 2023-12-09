@@ -132,6 +132,7 @@ const {
   deleteUser,
   updateUser,
   getUserInfo,
+  getAllUsers,
 } = require("../controllers/userContoller");
 const jwt = require("jsonwebtoken");
 const { firestoreDb } = require("../firebaseDB");
@@ -151,6 +152,7 @@ const crypto = require("crypto");
 
 const router = express.Router();
 router.post("/user", createUser);
+router.get("/users", getAllUsers);
 router.get("/user/:id", getUserInfo);
 router.put("/user/:id", updateUser);
 router.delete("/user/:id", deleteUser);
