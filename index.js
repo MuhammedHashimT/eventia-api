@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 const cookieParser = require("cookie-parser");
@@ -9,6 +8,8 @@ const userRoute = require("./routes/userRoute");
 const categoryRoute = require("./routes/categoryRoute");
 const morgan = require("morgan");
 const errorHandler = require("./utils/errorHandler");
+const { initializeFirebaseApp } = require("./firebaseDB");
+const eventRoute = require("./routes/eventRoute");
 
 require("dotenv").config();
 app.use(
@@ -21,17 +22,7 @@ app.use(morgan("dev"));
 const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(cookieParser());
-mongoose.set("strictQuery", false);
-
-// Connect to the MongoDB database
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("Connected to the database");
-  })
-  .catch((error) => {
-    console.error("Error connecting to the database:", error);
-  });
+initializeFirebaseApp();
 
 // Define the CRUD routes
 app.get("/", (req, res) => {
@@ -42,8 +33,10 @@ app.use((req, res, next) => {
   next();
 });
 // Create a new data model
+// app.use("/api", userRoute.routes);
+app.use("/api", [eventRoute.routes, userRoute.routes]);
 app.use("/api/data", dataRoute);
-app.use("/api/user", userRoute);
+// app.use("/api/user", userRoute);
 app.use("/api/category", categoryRoute);
 app.all("*", (req, res) => {
   res.status(400).json({
