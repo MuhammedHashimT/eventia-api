@@ -223,7 +223,7 @@ router.post("/signup", async (req, res) => {
       data.userId = userId;
       const docRef = doc(firestoreDb, "users", userId);
       const response = await setDoc(docRef, data);
-      res.status(200).json({ message: "User created successfully" , userId});
+      res.status(200).json({ message: "User created successfully" , data});
     }
     // res.send(finalData);
   } catch (error) {
