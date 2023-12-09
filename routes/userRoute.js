@@ -238,7 +238,7 @@ router.get("/mail", async (req, res) => {
   // const data = req.body;
   const driveClientId = process.env.GOOGLE_DRIVE_CLIENT_ID || '';
   const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
-  const accessToken = process.env.GOOGLE_DRIVE_ACCESS_TOKEN || '';
+  const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
   async function sendMail() {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -248,7 +248,7 @@ router.get("/mail", async (req, res) => {
         clientId: driveClientId,
         clientSecret: driveClientSecret,
         refreshToken: apiGoogle(),
-        accessToken: accessToken,
+        accessToken: apiGoogle(),
       },
     })
 

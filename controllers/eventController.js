@@ -72,41 +72,41 @@ const createEvent = async (req, res, next) => {
   try {
     const data = req.body;
     console.log(data);
-    return res.send(req.files)
-    const files = Array.isArray(req.files.files) ? req.files.files : [req.files.files];
-    console.log(files);
-    const uploadFile = async (filePath, fileName, mimeType) => {
-      // check the file is image
-      if (!mimeType.includes('image')) {
-        return res.status(400).send(`File is not an image`);
-      }
+    // const files = Array.isArray(req.files.files) ? req.files.files : [req.files.files];
+    // console.log(files);
+    // const uploadFile = async (filePath, fileName, mimeType) => {
+    //   // check the file is image
+    //   if (!mimeType.includes('image')) {
+    //     return res.status(400).send(`File is not an image`);
+    //   }
 
-      const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    //   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
-      try {
-        const drive = driveConfig();
-        const response = await drive.files.create({
-          requestBody: {
-            name: fileName,
-            mimeType,
-            parents: folderId ? [folderId] : [],
-          },
-          media: {
-            mimeType,
-            body: filePath,
-          },
-        });
-        return response.data.id;
-      } catch (error) {
-        return res.status(400).send(`Error on google drive upload , check the image of ${fileName}`);
-      }
-    }
-    const imageIds = await Promise.all(files.map(async (file) => {
-      const imageId = await uploadFile(file.tempFilePath, file.name, file.mimetype);
-      console.log(imageId);
-      return imageId;
-    }))
-    data.images = imageIds;
+    //   try {
+    //     const drive = driveConfig();
+    //     const response = await drive.files.create({
+    //       requestBody: {
+    //         name: fileName,
+    //         mimeType,
+    //         parents: folderId ? [folderId] : [],
+    //       },
+    //       media: {
+    //         mimeType,
+    //         body: filePath,
+    //       },
+    //     });
+    //     return response.data.id;
+    //   } catch (error) {
+    //     console.log(error);
+    //     return res.status(400).send(`Error on google drive upload , check the image of ${fileName}`);
+    //   }
+    // }
+    // const imageIds = await Promise.all(files.map(async (file) => {
+    //   const imageId = await uploadFile(file.tempFilePath, file.name, file.mimetype);
+    //   console.log(imageId);
+    //   return imageId;
+    // }))
+    // data.images = imageIds;
     const eventId = crypto.randomBytes(10).toString("hex");
     data.eventId = eventId;
     const docRef = doc(getFirestore(), "events", eventId);
