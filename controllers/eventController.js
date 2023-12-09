@@ -148,8 +148,8 @@ const createEvent = async (req, res, next) => {
         from: '"Team Eventia" <ahmedmsmd2005@gmail.com>', // sender address
         to: "ajnanpulikkathody@gmail.com", // list of receivers
         subject: "Hello Ajnan, your event is live", // Subject line
-        text: "Ask your freinds to join your event. ✈️✈️", // plain text body
-        // html: "<b>Hello world?</b>", // html body
+        // text: "Ask your freinds to join your event. ✈️✈️", // plain text body
+        html: "<h1>Tell about your event to freinds and make them excite. ✈️✈️</h1>", // html body
       })
       return info;
     }
