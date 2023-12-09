@@ -149,6 +149,9 @@ const {
   getFirestore,
 } = require("firebase/firestore");
 const crypto = require("crypto");
+const { driveConfig } = require("../utils/google/driveApi");
+const multer = require('multer');
+const upload = multer();
 
 const router = express.Router();
 router.post("/user", createUser);
@@ -227,6 +230,71 @@ router.post("/signup", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+
+// Admin signup route
+router.post("/upload", async (req, res) => {
+  const files = req.file;
+  console.log(files);
+  const uploadFile = async (filePath, fileName, mimeType) => {
+    // check the file is image
+    if (!mimeType.includes('image')) {
+      return res.status(400).send(`File is not an image`);
+    }
+
+    // // change the file path to buffer
+    // const buffer = Buffer.from(filePath);
+
+    // // change the buffer to readable stream
+    // const readableStream = new Readable({
+    //   read() {
+    //     this.push(buffer);
+    //     this.push(null);
+    //   },
+    // });
+
+    // Get the file extension.
+    const fileExtension = fileName.split('.')[1];
+
+    // get the folder id
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+
+    try {
+      // driveConfig
+      const drive = driveConfig();
+
+      const response = await drive.files.create({
+        requestBody: {
+          name: `${fileName}.${fileExtension}`, //file name
+          mimeType,
+          parents: folderId ? [folderId] : [],
+        },
+        media: {
+          mimeType,
+          body: filePath,
+        },
+      });
+      return response.data.id;
+    } catch (error) {
+      res.status(400).send(`Error on google drive upload , check the image of ${fileName}`);
+      //report the error message
+      // throw new HttpException(
+      //   `Error on google drive upload , check the image of ${fileName}`,
+      //   HttpStatus.BAD_REQUEST,
+      // );
+    }
+  }
+  try {
+    const imageIds = await files.map(async (file) => {
+      const imageId = await uploadFile(file.buffer, file.originalname, file.mimetype);
+      return imageId;
+    })
+    res.send(imageIds);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
 
 module.exports = {
   routes: router,

@@ -14,12 +14,13 @@ const eventRoute = require("./routes/eventRoute");
 require("dotenv").config();
 app.use(
   cors({
-    origin: "https://e-pedika.vercel.app",
+    origin: "*",
     credentials: true,
   })
 );
 app.use(morgan("dev"));
 const port = process.env.PORT || 5000;
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 initializeFirebaseApp();
