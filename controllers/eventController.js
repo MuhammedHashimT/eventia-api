@@ -72,6 +72,7 @@ const createEvent = async (req, res, next) => {
   try {
     const data = req.body;
     console.log(data);
+    return res.send(req.files)
     const files = Array.isArray(req.files.files) ? req.files.files : [req.files.files];
     console.log(files);
     const uploadFile = async (filePath, fileName, mimeType) => {
@@ -110,7 +111,7 @@ const createEvent = async (req, res, next) => {
     data.eventId = eventId;
     const docRef = doc(getFirestore(), "events", eventId);
     const result = await setDoc(docRef, data);
-    res.send("Event created successfuly");
+    res.status(200).json({ message: "Event created successfully", data });
   } catch (error) {
     res.status(400).send(error.message);
   }

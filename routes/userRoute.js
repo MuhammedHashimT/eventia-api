@@ -238,11 +238,8 @@ router.get("/mail", async (req, res) => {
   // const data = req.body;
   const driveClientId = process.env.GOOGLE_DRIVE_CLIENT_ID || '';
   const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
-  const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
+  const accessToken = process.env.GOOGLE_DRIVE_ACCESS_TOKEN || '';
   async function sendMail() {
-    console.log(apiGoogle());
-    apiGoogle().setCredentials({ refresh_token: driveRefreshToken });
-    const accessToken = await apiGoogle().getAccessToken();
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -250,7 +247,7 @@ router.get("/mail", async (req, res) => {
         user: "ahmedmsmd2005@gmail.com",
         clientId: driveClientId,
         clientSecret: driveClientSecret,
-        refreshToken: driveRefreshToken,
+        refreshToken: apiGoogle(),
         accessToken: accessToken,
       },
     })

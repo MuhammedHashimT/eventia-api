@@ -5,7 +5,7 @@ const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
 const driveRedirectUri = process.env.GOOGLE_DRIVE_REDIRECT_URI || '';
 const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
 
-const oauth2Client = new googleApi.auth.OAuth2(
+const oauth2Client = new google.auth.OAuth2(
     driveClientId,
     driveClientSecret,
     driveRedirectUri
